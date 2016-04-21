@@ -7,9 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -93,7 +91,7 @@ public class MyPanel extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.d("KSM", "onDraw: " + String.valueOf(SharedValues.hlCol) + ". " + String.valueOf(SharedValues.hlRow));
+        //Log.d("KSM", "onDraw: " + String.valueOf(SharedValues.hlCol) + ". " + String.valueOf(SharedValues.hlRow));
 
         float leftX;
         float topY;
@@ -139,9 +137,8 @@ public class MyPanel extends View {
                 }
 
                 //highlight cell if flagged
-                //if((c == SharedValues.hlCol) && (r == SharedValues.hlRow)){
-                if ((SharedValues.hlCol != -1) || (SharedValues.hlRow != -1)) {
-                    Log.d("KSM", "setting highlight");
+                if ((c == SharedValues.hlCol) && (r == SharedValues.hlRow)) {
+                    //Log.d("KSM", "setting highlight");
                     float[] corners = {leftX + 5, topY,
                             rightX - 5, topY,
                             rightX - 5, btmY,
@@ -190,40 +187,6 @@ public class MyPanel extends View {
         if(SharedValues.levelStatus == SharedValues.Status.FAILED)
             SharedValues.levelStatus = SharedValues.Status.INITIAL;
         invalidate();
-
-        if (SharedValues.playbackFlag) {
-            playBack();
-            SharedValues.playbackFlag = false;
-        }
-
-    }
-
-    void playBack() {
-        for (int r = 0; r < GameGrid.ROWS; ++r) {
-            for (int c = 0; c < GameGrid.COLS; ++c) {
-                Sprite sp = (GameGrid.myGrid[c][r]);
-                if ((sp != null) && (sp.measureSoundResource != 0)) {
-                    Log.d("KSM", "setting highlight");
-                    SharedValues.hlCol = c; //cell highlighting during playback
-                    SharedValues.hlRow = r; //cell highlighting during playback
-                    this.postInvalidate();
-                    Log.d("KSM", "invalidated");
-                    MediaPlayer mp = MediaPlayer.create(getContext(), sp.measureSoundResource);
-                    try {
-                        int dur = mp.getDuration();
-                        mp.start();
-                        Thread.sleep(dur);
-                        //disable cell highlighting
-                        SharedValues.hlCol = -1;
-                        SharedValues.hlRow = -1;
-                        this.postInvalidate();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
 
     }
 

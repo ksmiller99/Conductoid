@@ -10,9 +10,8 @@ public class SharedValues {
     public static int measureSoundResource;
     public static String gridPosistions; //when a measure is dropped, this is the CSV list of valid grid positions for that measure
     //controls cell highlight during playback
-    public static int hlCol = 0;
-    public static int hlRow = 0;
-    public static boolean playbackFlag = false;
+    public static int hlCol = -1;
+    public static int hlRow = -1;
 
     public enum Status {INITIAL, STARTED, FAILED}
 

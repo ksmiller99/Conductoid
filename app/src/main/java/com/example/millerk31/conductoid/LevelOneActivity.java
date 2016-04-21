@@ -23,9 +23,6 @@ public class LevelOneActivity extends AppCompatActivity {
     EndDraggingListener myEndDraggingListener;
 
     GameGrid gg;
-
-    PlaybackButtonListener pbListener;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +38,6 @@ public class LevelOneActivity extends AppCompatActivity {
 
         myStartDraggingListener = new StartDraggingListener();
         myEndDraggingListener = new EndDraggingListener();
-        pbListener = new PlaybackButtonListener();
 
         findViewById(R.id.btn1).setOnLongClickListener(myStartDraggingListener );
         findViewById(R.id.btn2).setOnLongClickListener(myStartDraggingListener );
@@ -121,7 +117,37 @@ public class LevelOneActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btnPlayGrid).setOnClickListener(pbListener);
+        findViewById(R.id.btnPlayGrid).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("KSM", "Entering onClickVew");
+                for (int r = 0; r < GameGrid.ROWS; ++r) {
+                    for (int c = 0; c < GameGrid.COLS; ++c) {
+                        Sprite sp = (GameGrid.myGrid[c][r]);
+                        if ((sp != null) && (sp.measureSoundResource != 0)) {
+                            Log.d("KSM", "setting highlight");
+                            SharedValues.hlCol = c; //cell highlighting during playback
+                            SharedValues.hlRow = r; //cell highlighting during playback
+                            findViewById(R.id.myPanel).invalidate();
+                            Log.d("KSM", "invalidated");
+                            MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, sp.measureSoundResource);
+                            try {
+                                int dur = mp.getDuration();
+                                mp.start();
+                                Thread.sleep(dur);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                //disable cell highlighting
+                SharedValues.hlCol = -1;
+                SharedValues.hlRow = -1;
+                findViewById(R.id.myPanel).invalidate();
+
+            }
+        });
 
     }
 
@@ -154,40 +180,6 @@ public class LevelOneActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public class PlaybackButtonListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            Log.d("KSM", "Entering onClickVew");
-            SharedValues.playbackFlag = true;
-            //make a play list of valid sounds
-//            for(int r = 0; r < gg.ROWS; ++r){
-//                for(int c = 0; c < gg.COLS; ++c){
-//                    Sprite sp = (gg.myGrid[c][r]);
-//                    if ((sp != null) && (sp.measureSoundResource != 0)){
-//                        Log.d("KSM","setting highlight");
-//                        SharedValues.hlCol = c; //cell highlighting during playback
-//                        SharedValues.hlRow = r; //cell highlighting during playback
-//                        findViewById(R.id.myPanel).invalidate();
-//                        Log.d("KSM","invalidated");
-//                        MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this,sp.measureSoundResource);
-//                        try{
-//                            int dur = mp.getDuration();
-//                            mp.start();
-//                            Thread.sleep(dur);
-//                        }catch(Exception e){
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
-//            //disable cell highlighting
-//            SharedValues.hlCol = -1;
-//            SharedValues.hlRow = -1;
-//            findViewById(R.id.myPanel).invalidate();
-
-        }
     }
 
     private class EndDraggingListener implements View.OnDragListener{
