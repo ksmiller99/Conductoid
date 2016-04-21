@@ -8,7 +8,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,11 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+public class LevelOneActivity extends AppCompatActivity {
 
     StartDraggingListener myStartDraggingListener;
     EndDraggingListener myEndDraggingListener;
-    Button btn1, btn2;
+
 
     MyPanel panel;
     @Override
@@ -33,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         toolbar.setLogo(R.drawable.conductoid);
+
+        SharedValues.songLength=6;
 
         myStartDraggingListener = new StartDraggingListener();
         myEndDraggingListener = new EndDraggingListener();
@@ -50,10 +51,27 @@ public class MainActivity extends AppCompatActivity {
 //        btn1 = (Button)findViewById(R.id.btn1);
 //        btn2 = (Button)findViewById(R.id.btn2);
 
+        findViewById(R.id.imageButton3).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_twinkle_little_star_one_cycle);
+                mp.start();
+            }
+        });
+
+        findViewById(R.id.imageButton).setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                  SharedValues.levelStatus = SharedValues.Status.FAILED;
+              }
+          }
+        );
+
+
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.twinkle_1);
+                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_1);
                 mp.start();
             }
         });
@@ -61,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.twinkle_2);
+                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
                 mp.start();
             }
         });
@@ -69,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.twinkle_3);
+                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
                 mp.start();
             }
         });
@@ -77,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.twinkle_3);
+                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
                 mp.start();
             }
         });
@@ -85,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.twinkle_1);
+                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_1);
                 mp.start();
             }
         });
@@ -93,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn6).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.twinkle_2);
+                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
                 mp.start();
             }
         });
@@ -101,12 +119,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    public void setRect(View view) {
-        SharedValuesXY.drawingMode = "RECT";
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
-    public void setOval(View view) {
-        SharedValuesXY.drawingMode = "OVAL";
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private class EndDraggingListener implements View.OnDragListener{
@@ -158,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 default:
-                    Log.d("MainActivity","StartDraggingListener unknown button");
+                    Log.d("LevelOneActivity","StartDraggingListener unknown button");
                     break;
 
             }
@@ -174,27 +206,5 @@ public class MainActivity extends AppCompatActivity {
             //super.onDrawShadow(canvas);
             canvas.drawBitmap(shdBitmap,(canvas.getWidth()-shdBitmap.getWidth())/2,(canvas.getHeight()-shdBitmap.getHeight())/2,null);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

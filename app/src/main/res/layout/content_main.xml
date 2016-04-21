@@ -8,8 +8,29 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_main" tools:context="com.example.millerk31.conductoid.MainActivity">
+    tools:showIn="@layout/activity_main" tools:context=".LevelOneActivity"
+    android:weightSum="1">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton2" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton3" />
+    </LinearLayout>
     
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,5 +83,16 @@
     <com.example.millerk31.conductoid.MyPanel
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/myPnl"/>
+        android:id="@+id/myPnl"
+        android:layout_weight="1.25" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton4" />
+    </LinearLayout>
 </LinearLayout>
