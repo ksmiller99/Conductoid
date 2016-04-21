@@ -7,7 +7,9 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,25 +29,21 @@ public class MyPanel extends View {
     float width;
     float height;
 
-    static final int ROWS = 5;
-    static final int COLS = 10;
-
-    Paint bgPaint = new Paint();
+    Paint bluePaint = new Paint();
     Paint activePaint = new Paint();
-
-     //grid of canvas - keeps track of which graphic is each cell of the canvas
-    Sprite myGrid[][];
+    Paint bgPaint = new Paint();
 
     //list of exploding Sprites
     ArrayList<Sprite> expSprites;
 
+    GameGrid gg;
 
     int cellHeight, cellWidth;
 
     public MyPanel(Context context, AttributeSet set) {
         super(context, set);
 
-        myGrid = new Sprite[COLS][ROWS];
+        gg = GameGrid.getInstance();
         expSprites = new ArrayList<Sprite>();
 
         setOnTouchListener(new View.OnTouchListener() {
@@ -70,60 +68,15 @@ public class MyPanel extends View {
 
     }
 
-    class EndDraggingListener implements View.OnDragListener{
-
-        @Override
-        public boolean onDrag(View v, DragEvent event) {
-            if(event.getAction() == DragEvent.ACTION_DROP){
-                //                ((Button)v).setBackground(((Button) event.getLocalState()).getBackground());
-                float x = event.getX();
-                float y = event.getY();
-                int row = (int)y/cellHeight;
-                int col = (int)x/cellWidth;
-
-                Button btn = (Button) event.getLocalState();
-                Drawable drw = btn.getBackground();
-                Bitmap bmp = ((BitmapDrawable)drw).getBitmap();
-                Bitmap bmp2 = Bitmap.createScaledBitmap(bmp,cellWidth,cellHeight,false);
-
-                //check to see if cell is active
-                if(((row*COLS)+col) < SharedValues.songLength){
-                    (myGrid[col][row])= new Sprite(bmp2);
-                }else{
-                    //explode?
-                    expSprites.add(new Sprite(bmp2,x,y));
-                }
-
-
-            }
-            return true;
-        }
+    public static Bitmap rotateBitmap(Bitmap source, float angle) {
+        //from http://stackoverflow.com/questions/4166917/android-how-to-rotate-a-bitmap-on-a-center-point
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
-    class Sprite{
-        Bitmap bmp;
-        int soundIndex;
-
-        //these vars are for exploding
-        float x, y, a, xSpeed, ySpeed, aSpeed;
-
-
-        public Sprite(Bitmap bmp) {
-            this.bmp = bmp;
-        }
-
-        public Sprite(Bitmap bmp, float x, float y  ){
-            this(bmp);
-            this.x = x;
-            this.y = y;
-            a = 0;  //rotation angle
-
-            xSpeed = (float)(10.0 - (Math.random()*20))*5;
-            ySpeed = (float)(10.0 - (Math.random()*20))*5;
-            aSpeed = (float)(Math.random()*10)+10;
-
-        }
-
+    public void myInvalidate() {
+        this.invalidate();
     }
 
     @Override
@@ -140,29 +93,61 @@ public class MyPanel extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.d("KSM", "onDraw: " + String.valueOf(SharedValues.hlCol) + ". " + String.valueOf(SharedValues.hlRow));
+
+        float leftX;
+        float topY;
+        float rightX;
+        float btmY;
 
         if(SharedValues.levelStatus == SharedValues.Status.FAILED){
 
         }
 
+        bgPaint.setARGB(255, 255, 255, 0);
+        bluePaint.setARGB(255, 0, 0, 255);
+        activePaint.setARGB(255, 192, 192, 192);
         canvas.drawARGB(255, 255, 255, 0);
-        bgPaint.setARGB(255, 0, 0, 255);
-        activePaint.setARGB(255,64,64,64);
 
         //draw the cells and contents
-        for(int r = 0; r < ROWS; ++r){
-            for(int c = 0; c < COLS; ++c) {
+        for (int r = 0; r < GameGrid.ROWS; ++r) {
+            for (int c = 0; c < GameGrid.COLS; ++c) {
+
+                //calculate top-left and lower-right points of cell
+                leftX = c * cellWidth;
+                topY = r * cellHeight;
+                rightX = ((c * cellWidth) + cellWidth) - 5;
+                btmY = (r * cellHeight) + cellHeight;
+
                 //different color for droppable cells
-                if((r*COLS + c)< SharedValues.songLength){
-                    canvas.drawRect(c * cellWidth, r * cellHeight,(c * cellWidth)+cellWidth,(r * cellHeight)+cellHeight,activePaint);
+                if ((r * GameGrid.COLS + c) < SharedValues.songLength) {
+                    //make active cells grey
+                    canvas.drawRect(leftX, topY, rightX, btmY, activePaint);
+
+                    //put line between cells
+                    canvas.drawRect(rightX, topY, rightX + 5, btmY, bgPaint);
                 }
-                if((myGrid[c][r]) != null) {
+
+                //if cell contains Sprite, process it
+                if ((GameGrid.myGrid[c][r]) != null) {
                     if(SharedValues.levelStatus == SharedValues.Status.FAILED){
-                        expSprites.add(new Sprite(myGrid[c][r].bmp,c * cellWidth,r * cellHeight));
-                        (myGrid[c][r]) = null;
+                        expSprites.add(new Sprite(GameGrid.myGrid[c][r].bmp, c * cellWidth, r * cellHeight));
+                        (GameGrid.myGrid[c][r]) = null;
                     }else {
-                        canvas.drawBitmap((myGrid[c][r]).bmp, c * cellWidth, r * cellHeight, null);
+                        canvas.drawBitmap((GameGrid.myGrid[c][r]).bmp, c * cellWidth, r * cellHeight, null);
                     }
+                }
+
+                //highlight cell if flagged
+                //if((c == SharedValues.hlCol) && (r == SharedValues.hlRow)){
+                if ((SharedValues.hlCol != -1) || (SharedValues.hlRow != -1)) {
+                    Log.d("KSM", "setting highlight");
+                    float[] corners = {leftX + 5, topY,
+                            rightX - 5, topY,
+                            rightX - 5, btmY,
+                            leftX + 5, btmY,
+                            leftX + 5, topY};
+                    canvas.drawLines(corners, bluePaint);
                 }
             }
         }
@@ -190,7 +175,7 @@ public class MyPanel extends View {
 //                    Math.min(SharedValues.startY, SharedValues.endY),
 //                    Math.max(SharedValues.startX, SharedValues.endX),
 //                    Math.max(SharedValues.startY, SharedValues.endY)
-//                    , bgPaint);
+//                    , bluePaint);
 //        }else{
 //            canvas.drawOval(
 //
@@ -198,7 +183,7 @@ public class MyPanel extends View {
 //                    Math.min(SharedValues.startY, SharedValues.endY),
 //                    Math.max(SharedValues.startX, SharedValues.endX),
 //                    Math.max(SharedValues.startY, SharedValues.endY)
-//                    , bgPaint);
+//                    , bluePaint);
 //
 //        }
 
@@ -206,14 +191,73 @@ public class MyPanel extends View {
             SharedValues.levelStatus = SharedValues.Status.INITIAL;
         invalidate();
 
+        if (SharedValues.playbackFlag) {
+            playBack();
+            SharedValues.playbackFlag = false;
+        }
+
     }
 
-    public static Bitmap rotateBitmap(Bitmap source, float angle) {
-        //from http://stackoverflow.com/questions/4166917/android-how-to-rotate-a-bitmap-on-a-center-point
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    void playBack() {
+        for (int r = 0; r < GameGrid.ROWS; ++r) {
+            for (int c = 0; c < GameGrid.COLS; ++c) {
+                Sprite sp = (GameGrid.myGrid[c][r]);
+                if ((sp != null) && (sp.measureSoundResource != 0)) {
+                    Log.d("KSM", "setting highlight");
+                    SharedValues.hlCol = c; //cell highlighting during playback
+                    SharedValues.hlRow = r; //cell highlighting during playback
+                    this.postInvalidate();
+                    Log.d("KSM", "invalidated");
+                    MediaPlayer mp = MediaPlayer.create(getContext(), sp.measureSoundResource);
+                    try {
+                        int dur = mp.getDuration();
+                        mp.start();
+                        Thread.sleep(dur);
+                        //disable cell highlighting
+                        SharedValues.hlCol = -1;
+                        SharedValues.hlRow = -1;
+                        this.postInvalidate();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+
     }
 
+    //called when a measure is dropped on Panel
+    class EndDraggingListener implements View.OnDragListener {
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            if (event.getAction() == DragEvent.ACTION_DROP) {
+
+                //convert canvas X/Y to grid colum/row
+                float x = event.getX();
+                float y = event.getY();
+                int row = (int) y / cellHeight;
+                int col = (int) x / cellWidth;
+
+                //extract image from shadow and convert to bitmap same size as cell
+                Button btn = (Button) event.getLocalState();
+                Drawable drw = btn.getBackground();
+                Bitmap bmp = ((BitmapDrawable) drw).getBitmap();
+                Bitmap bmp2 = Bitmap.createScaledBitmap(bmp, cellWidth - 5, cellHeight, false);
+
+                //check to see if cell is active
+                if (((row * GameGrid.COLS) + col) < SharedValues.songLength) {
+                    (GameGrid.myGrid[col][row]) = new Sprite(bmp2, SharedValues.gridPosistions, SharedValues.measureSoundResource);
+                } else {
+                    //not an active cell - explode it!
+                    expSprites.add(new Sprite(bmp2, x, y));
+                }
+
+
+            }
+            return true;
+        }
+    }
 
 }

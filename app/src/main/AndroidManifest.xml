@@ -3,17 +3,18 @@
     package="com.example.millerk31.conductoid" >
 
     <application
-        android:largeHeap="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_conductoid"
         android:label="@string/app_name"
-        android:logo="@drawable/conductoid"
+        android:largeHeap="true"
+        android:logo="@mipmap/ic_conductoid"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".LevelOneActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

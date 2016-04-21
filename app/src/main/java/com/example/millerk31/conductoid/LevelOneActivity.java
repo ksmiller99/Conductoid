@@ -22,21 +22,26 @@ public class LevelOneActivity extends AppCompatActivity {
     StartDraggingListener myStartDraggingListener;
     EndDraggingListener myEndDraggingListener;
 
+    GameGrid gg;
 
-    MyPanel panel;
+    PlaybackButtonListener pbListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         toolbar.setLogo(R.drawable.conductoid);
 
+        //set length of this song
         SharedValues.songLength=6;
+
+        gg = GameGrid.getInstance();
 
         myStartDraggingListener = new StartDraggingListener();
         myEndDraggingListener = new EndDraggingListener();
+        pbListener = new PlaybackButtonListener();
 
         findViewById(R.id.btn1).setOnLongClickListener(myStartDraggingListener );
         findViewById(R.id.btn2).setOnLongClickListener(myStartDraggingListener );
@@ -51,7 +56,7 @@ public class LevelOneActivity extends AppCompatActivity {
 //        btn1 = (Button)findViewById(R.id.btn1);
 //        btn2 = (Button)findViewById(R.id.btn2);
 
-        findViewById(R.id.imageButton3).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.btnPlaySong).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_twinkle_little_star_one_cycle);
@@ -59,7 +64,7 @@ public class LevelOneActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.imageButton).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnReset).setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {
                   SharedValues.levelStatus = SharedValues.Status.FAILED;
@@ -116,6 +121,7 @@ public class LevelOneActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.btnPlayGrid).setOnClickListener(pbListener);
 
     }
 
@@ -134,11 +140,54 @@ public class LevelOneActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+
+            case R.id.action_exit:
+                //todo causes window leak error
+                this.finishAffinity();
+                break;
+
+            default:
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class PlaybackButtonListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Log.d("KSM", "Entering onClickVew");
+            SharedValues.playbackFlag = true;
+            //make a play list of valid sounds
+//            for(int r = 0; r < gg.ROWS; ++r){
+//                for(int c = 0; c < gg.COLS; ++c){
+//                    Sprite sp = (gg.myGrid[c][r]);
+//                    if ((sp != null) && (sp.measureSoundResource != 0)){
+//                        Log.d("KSM","setting highlight");
+//                        SharedValues.hlCol = c; //cell highlighting during playback
+//                        SharedValues.hlRow = r; //cell highlighting during playback
+//                        findViewById(R.id.myPanel).invalidate();
+//                        Log.d("KSM","invalidated");
+//                        MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this,sp.measureSoundResource);
+//                        try{
+//                            int dur = mp.getDuration();
+//                            mp.start();
+//                            Thread.sleep(dur);
+//                        }catch(Exception e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//            //disable cell highlighting
+//            SharedValues.hlCol = -1;
+//            SharedValues.hlRow = -1;
+//            findViewById(R.id.myPanel).invalidate();
+
+        }
     }
 
     private class EndDraggingListener implements View.OnDragListener{
@@ -146,7 +195,7 @@ public class LevelOneActivity extends AppCompatActivity {
         @Override
         public boolean onDrag(View v, DragEvent event) {
             if(event.getAction() == DragEvent.ACTION_DROP){
-                ((Button)v).setBackground(((Button) event.getLocalState()).getBackground());
+                v.setBackground(((Button) event.getLocalState()).getBackground());
             }
             return true;
         }
@@ -175,18 +224,24 @@ public class LevelOneActivity extends AppCompatActivity {
                 case R.id.btn5:
                     myDrawable = getResources().getDrawable(R.mipmap.ic_twinkle1);
                     shdBitmap = ((BitmapDrawable)myDrawable).getBitmap();
+                    SharedValues.gridPosistions = "1,5";
+                    SharedValues.measureSoundResource = R.raw.twinkle_1;
                     break;
 
                 case R.id.btn2:
                 case R.id.btn6:
                     myDrawable = getResources().getDrawable(R.mipmap.ic_twinkle1);
                     shdBitmap = ((BitmapDrawable)myDrawable).getBitmap();
+                    SharedValues.gridPosistions = "2,6";
+                    SharedValues.measureSoundResource = R.raw.twinkle_2;
                     break;
 
                 case R.id.btn3:
                 case R.id.btn4:
                     myDrawable = getResources().getDrawable(R.mipmap.ic_twinkle1);
                     shdBitmap = ((BitmapDrawable)myDrawable).getBitmap();
+                    SharedValues.gridPosistions = "3,4";
+                    SharedValues.measureSoundResource = R.raw.twinkle_3;
                     break;
 
                 default:
@@ -207,4 +262,6 @@ public class LevelOneActivity extends AppCompatActivity {
             canvas.drawBitmap(shdBitmap,(canvas.getWidth()-shdBitmap.getWidth())/2,(canvas.getHeight()-shdBitmap.getHeight())/2,null);
         }
     }
+
+
 }
