@@ -5,14 +5,15 @@ package com.example.millerk31.conductoid;
  */
 public class SharedValues {
 
-    public static Status levelStatus;
+    public static GameStatus levelGameStatus;
     public static int songLength;
     public static int measureSoundResource;
     public static String gridPosistions; //when a measure is dropped, this is the CSV list of valid grid positions for that measure
+
     //controls cell highlight during playback
     public static int hlCol = -1;
     public static int hlRow = -1;
 
-    public enum Status {INITIAL, STARTED, FAILED}
+    public enum GameStatus {INITIAL, STARTED, RESET, FAILED}
 
 }

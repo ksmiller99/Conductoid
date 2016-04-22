@@ -16,13 +16,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class LevelOneActivity extends AppCompatActivity {
 
     StartDraggingListener myStartDraggingListener;
     EndDraggingListener myEndDraggingListener;
 
+    GameButton btn1, btn2, btn3, btn4, btn5, btn6;
+    MyPanel panel;
+
     GameGrid gg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,26 +40,93 @@ public class LevelOneActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.drawable.conductoid);
 
-        //set length of this song
+        //set length of this song in measures
         SharedValues.songLength=6;
 
         gg = GameGrid.getInstance();
+        panel = (MyPanel) findViewById(R.id.myPanel);
 
         myStartDraggingListener = new StartDraggingListener();
         myEndDraggingListener = new EndDraggingListener();
 
-        findViewById(R.id.btn1).setOnLongClickListener(myStartDraggingListener );
-        findViewById(R.id.btn2).setOnLongClickListener(myStartDraggingListener );
-        findViewById(R.id.btn3).setOnLongClickListener(myStartDraggingListener );
-        findViewById(R.id.btn4).setOnLongClickListener(myStartDraggingListener );
-        findViewById(R.id.btn5).setOnLongClickListener(myStartDraggingListener );
-        findViewById(R.id.btn6).setOnLongClickListener(myStartDraggingListener );
+        btn1 = (GameButton) findViewById(R.id.btn1);
+        btn2 = (GameButton) findViewById(R.id.btn2);
+        btn3 = (GameButton) findViewById(R.id.btn3);
+        btn4 = (GameButton) findViewById(R.id.btn4);
+        btn5 = (GameButton) findViewById(R.id.btn5);
+        btn6 = (GameButton) findViewById(R.id.btn6);
 
-//        findViewById(R.id.btn1).setOnDragListener(myEndDraggingListener);
-//        findViewById(R.id.btn2).setOnDragListener(myEndDraggingListener);
+        //this data determines what this level is
+        btn1.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0|4,0", false);
+        btn2.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0|5,0", false);
+        btn3.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "2,0|3,0", false);
+        btn4.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0|0,4", false);
+        btn5.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0|4,0", false);
+        btn6.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0|5,0", false);
 
-//        btn1 = (Button)findViewById(R.id.btn1);
-//        btn2 = (Button)findViewById(R.id.btn2);
+        //shuffle buttons in layout
+        ArrayList<GameButton> gb = new ArrayList<>();
+        gb.add(btn1);
+        gb.add(btn2);
+        gb.add(btn3);
+        gb.add(btn4);
+        gb.add(btn5);
+        gb.add(btn6);
+
+        long seed = System.nanoTime();
+        Collections.shuffle(gb, new Random(seed));
+
+        android.widget.RelativeLayout.LayoutParams params;
+        params = (RelativeLayout.LayoutParams) gb.get(0).getLayoutParams();
+        params.removeRule(RelativeLayout.END_OF);
+        params.addRule(RelativeLayout.ALIGN_PARENT_START);
+        gb.get(0).setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) gb.get(1).getLayoutParams();
+        params.removeRule(RelativeLayout.END_OF);
+        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
+        params.addRule(RelativeLayout.END_OF, gb.get(0).getId());
+        gb.get(1).setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) gb.get(2).getLayoutParams();
+        params.removeRule(RelativeLayout.END_OF);
+        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
+        params.addRule(RelativeLayout.END_OF, gb.get(1).getId());
+        gb.get(2).setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) gb.get(3).getLayoutParams();
+        params.removeRule(RelativeLayout.END_OF);
+        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
+        params.addRule(RelativeLayout.END_OF, gb.get(2).getId());
+        gb.get(3).setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) gb.get(4).getLayoutParams();
+        params.removeRule(RelativeLayout.END_OF);
+        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
+        params.addRule(RelativeLayout.END_OF, gb.get(3).getId());
+        gb.get(4).setLayoutParams(params);
+
+        params = (RelativeLayout.LayoutParams) gb.get(5).getLayoutParams();
+        params.removeRule(RelativeLayout.END_OF);
+        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
+        params.addRule(RelativeLayout.END_OF, gb.get(4).getId());
+        gb.get(5).setLayoutParams(params);
+
+
+//        btn1.setLayoutParams(new LinearLayout.LayoutParams(panel.cellHeight,panel.cellWidth));
+//        //btn1.setHeight(panel.cellHeight); btn1.setWidth(panel.cellWidth);
+//        btn2.setHeight(panel.cellHeight); btn2.setWidth(panel.cellWidth);
+//        btn3.setHeight(panel.cellHeight); btn3.setWidth(panel.cellWidth);
+//        btn4.setHeight(panel.cellHeight); btn4.setWidth(panel.cellWidth);
+//        btn5.setHeight(panel.cellHeight); btn5.setWidth(panel.cellWidth);
+//        btn6.setHeight(panel.cellHeight); btn6.setWidth(panel.cellWidth);
+
+        btn1.setOnLongClickListener(myStartDraggingListener);
+        btn2.setOnLongClickListener(myStartDraggingListener);
+        btn3.setOnLongClickListener(myStartDraggingListener);
+        btn4.setOnLongClickListener(myStartDraggingListener);
+        btn5.setOnLongClickListener(myStartDraggingListener);
+        btn6.setOnLongClickListener(myStartDraggingListener);
 
         findViewById(R.id.btnPlaySong).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,13 +139,13 @@ public class LevelOneActivity extends AppCompatActivity {
         findViewById(R.id.btnReset).setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {
-                  SharedValues.levelStatus = SharedValues.Status.FAILED;
+                  SharedValues.levelGameStatus = SharedValues.GameStatus.RESET;
               }
           }
         );
 
 
-        findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener(){
+        btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_1);

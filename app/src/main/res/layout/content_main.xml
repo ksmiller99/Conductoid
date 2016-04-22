@@ -26,70 +26,71 @@
             android:src="@drawable/ic_replay_black_24dp" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <ImageButton
             android:id="@+id/btnPlaySong"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_volume_up_black_24dp" />
     </LinearLayout>
-    
-    <LinearLayout
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
+        <com.example.millerk31.conductoid.GameButton
             android:id="@+id/btn1"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:background="@mipmap/ic_twinkle1" />
 
-         <Button
+        <com.example.millerk31.conductoid.GameButton
              android:id="@+id/btn2"
-             android:layout_width="0dp"
+            android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:layout_weight="1"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/btn1"
              android:background="@mipmap/ic_twinkle2" />
 
-        <Button
+        <com.example.millerk31.conductoid.GameButton
             android:id="@+id/btn3"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/btn2"
             android:background="@mipmap/ic_twinkle3" />
 
-        <Button
+        <com.example.millerk31.conductoid.GameButton
             android:id="@+id/btn4"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/btn3"
             android:background="@mipmap/ic_twinkle3" />
 
-        <Button
+        <com.example.millerk31.conductoid.GameButton
             android:id="@+id/btn5"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/btn4"
             android:background="@mipmap/ic_twinkle1" />
 
-        <Button
+        <com.example.millerk31.conductoid.GameButton
             android:id="@+id/btn6"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/btn5"
             android:background="@mipmap/ic_twinkle2" />
 
-    </LinearLayout>
+    </RelativeLayout>
     <com.example.millerk31.conductoid.MyPanel
         android:id="@+id/myPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1.0" />
+        android:layout_weight="1" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

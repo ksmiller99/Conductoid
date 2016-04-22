@@ -20,23 +20,19 @@ import java.util.ArrayList;
  */
 public class MyPanel extends View {
 
+    public int cellHeight, cellWidth;
     float startX;
     float startY;
     float endX;
     float endY;
     float width;
     float height;
-
     Paint bluePaint = new Paint();
     Paint activePaint = new Paint();
     Paint bgPaint = new Paint();
-
     //list of exploding Sprites
     ArrayList<Sprite> expSprites;
-
     GameGrid gg;
-
-    int cellHeight, cellWidth;
 
     public MyPanel(Context context, AttributeSet set) {
         super(context, set);
@@ -98,7 +94,7 @@ public class MyPanel extends View {
         float rightX;
         float btmY;
 
-        if(SharedValues.levelStatus == SharedValues.Status.FAILED){
+        if (SharedValues.levelGameStatus == SharedValues.GameStatus.RESET) {
 
         }
 
@@ -128,7 +124,7 @@ public class MyPanel extends View {
 
                 //if cell contains Sprite, process it
                 if ((GameGrid.myGrid[c][r]) != null) {
-                    if(SharedValues.levelStatus == SharedValues.Status.FAILED){
+                    if (SharedValues.levelGameStatus == SharedValues.GameStatus.RESET) {
                         expSprites.add(new Sprite(GameGrid.myGrid[c][r].bmp, c * cellWidth, r * cellHeight));
                         (GameGrid.myGrid[c][r]) = null;
                     }else {
@@ -166,26 +162,9 @@ public class MyPanel extends View {
 
         }
 
-//        if(SharedValues.drawingMode.equals("RECT")) {
-//            canvas.drawRect(
-//                    Math.min(SharedValues.startX, SharedValues.endX),
-//                    Math.min(SharedValues.startY, SharedValues.endY),
-//                    Math.max(SharedValues.startX, SharedValues.endX),
-//                    Math.max(SharedValues.startY, SharedValues.endY)
-//                    , bluePaint);
-//        }else{
-//            canvas.drawOval(
-//
-//                    Math.min(SharedValues.startX, SharedValues.endX),
-//                    Math.min(SharedValues.startY, SharedValues.endY),
-//                    Math.max(SharedValues.startX, SharedValues.endX),
-//                    Math.max(SharedValues.startY, SharedValues.endY)
-//                    , bluePaint);
-//
-//        }
 
-        if(SharedValues.levelStatus == SharedValues.Status.FAILED)
-            SharedValues.levelStatus = SharedValues.Status.INITIAL;
+        if (SharedValues.levelGameStatus == SharedValues.GameStatus.RESET)
+            SharedValues.levelGameStatus = SharedValues.GameStatus.INITIAL;
         invalidate();
 
     }
