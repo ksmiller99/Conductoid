@@ -4,8 +4,8 @@ package com.example.millerk31.conductoid;
  * Created by Kevin on 4/21/2016.
  */
 public class GameGrid {
-    public static final int ROWS = 5;
-    public static final int COLS = 10;
+    public static final int ROWS = 4;
+    public static final int COLS = 8;
 
 
     //grid of canvas - keeps track of which graphic is each cell of the canvas

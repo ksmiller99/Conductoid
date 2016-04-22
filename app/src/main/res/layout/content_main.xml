@@ -16,7 +16,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="24dp"
         android:orientation="horizontal">
 
         <ImageButton
@@ -30,6 +30,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_volume_up_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/btnPlayGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_play_arrow_black_24dp" />
     </LinearLayout>
 
     <RelativeLayout
@@ -96,10 +102,5 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/btnPlayGrid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_volume_down_black_24dp" />
     </LinearLayout>
 </LinearLayout>

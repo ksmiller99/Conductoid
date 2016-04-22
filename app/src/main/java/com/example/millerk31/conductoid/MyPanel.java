@@ -69,14 +69,10 @@ public class MyPanel extends View {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
-    public void myInvalidate() {
-        this.invalidate();
-    }
-
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        this.cellHeight = h/5;
-        this. cellWidth = w/10;
+        this.cellHeight = h / GameGrid.ROWS;
+        this.cellWidth = w / GameGrid.COLS;
 
         this.width = w;
         this.height = h;
@@ -133,7 +129,7 @@ public class MyPanel extends View {
                     }
                 }
 
-                //highlight cell if flagged
+                //highlight cell during playback if flagged
                 //todo cell highlight during playback not working OnClickListener blocks thread?
                 if ((c == SharedValues.hlCol) && (r == SharedValues.hlRow)) {
                     //Log.d("KSM", "setting highlight");
@@ -167,8 +163,6 @@ public class MyPanel extends View {
                         canvas.drawLines(corners, redPaint);
 
                     }
-
-
                 }
             }
         }
@@ -226,8 +220,6 @@ public class MyPanel extends View {
                     //not an active cell - explode it!
                     expSprites.add(new Sprite(bmp2, x, y));
                 }
-
-
             }
             return true;
         }

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +25,7 @@ public class LevelOneActivity extends AppCompatActivity {
 
     StartDraggingListener myStartDraggingListener;
     EndDraggingListener myEndDraggingListener;
+    GbOnClickListener myGbOnClickListener;
 
     GameButton btn1, btn2, btn3, btn4, btn5, btn6;
     MyPanel panel;
@@ -48,6 +48,7 @@ public class LevelOneActivity extends AppCompatActivity {
 
         myStartDraggingListener = new StartDraggingListener();
         myEndDraggingListener = new EndDraggingListener();
+        myGbOnClickListener = new GbOnClickListener();
 
         btn1 = (GameButton) findViewById(R.id.btn1);
         btn2 = (GameButton) findViewById(R.id.btn2);
@@ -59,8 +60,8 @@ public class LevelOneActivity extends AppCompatActivity {
         //this data determines what this level is
         btn1.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
         btn2.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
-        btn3.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "2,0:3,0", false);
-        btn4.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:0,4", false);
+        btn3.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle1, "2,0:3,0", false);
+        btn4.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle1, "0,0:0,4", false);
         btn5.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
         btn6.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
 
@@ -128,6 +129,13 @@ public class LevelOneActivity extends AppCompatActivity {
         btn5.setOnLongClickListener(myStartDraggingListener);
         btn6.setOnLongClickListener(myStartDraggingListener);
 
+        btn1.setOnClickListener(myGbOnClickListener);
+        btn2.setOnClickListener(myGbOnClickListener);
+        btn3.setOnClickListener(myGbOnClickListener);
+        btn4.setOnClickListener(myGbOnClickListener);
+        btn5.setOnClickListener(myGbOnClickListener);
+        btn6.setOnClickListener(myGbOnClickListener);
+
         findViewById(R.id.btnPlaySong).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,53 +157,54 @@ public class LevelOneActivity extends AppCompatActivity {
         );
 
 
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_1);
-                mp.start();
-            }
-        });
-
-        findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
-                mp.start();
-            }
-        });
-
-        findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
-                mp.start();
-            }
-        });
-
-        findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
-                mp.start();
-            }
-        });
-
-        findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_1);
-                mp.start();
-            }
-        });
-
-        findViewById(R.id.btn6).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
-                mp.start();
-            }
-        });
+//        btn1.setOnClickListener(new GameButton.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                GameButton gb = (GameButton) v;
+//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, gb.getSoundResourceId());
+//                mp.start();
+//            }
+//        });
+//
+//        findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
+//                mp.start();
+//            }
+//        });
+//
+//        findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
+//                mp.start();
+//            }
+//        });
+//
+//        findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
+//                mp.start();
+//            }
+//        });
+//
+//        findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_1);
+//                mp.start();
+//            }
+//        });
+//
+//        findViewById(R.id.btn6).setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
+//                mp.start();
+//            }
+//        });
 
         findViewById(R.id.btnPlayGrid).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -241,9 +250,6 @@ public class LevelOneActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -279,7 +285,8 @@ public class LevelOneActivity extends AppCompatActivity {
         @Override
         public boolean onLongClick(View v) {
 
-            WithDraggingShadow shadow = new WithDraggingShadow(v);
+            GameButton gb = (GameButton) v;
+            WithDraggingShadow shadow = new WithDraggingShadow(gb);
             ClipData data = ClipData.newPlainText("","");
             v.startDrag(data,shadow,v,0);
             return false;
@@ -288,40 +295,12 @@ public class LevelOneActivity extends AppCompatActivity {
 
     private class WithDraggingShadow extends View.DragShadowBuilder{
         Bitmap shdBitmap;
-        Drawable myDrawable;
 
-        public WithDraggingShadow(View v){
-            super(v);
-            switch(v.getId()){
-                case R.id.btn1:
-                case R.id.btn5:
-                    myDrawable = getResources().getDrawable(R.mipmap.ic_twinkle1);
-                    shdBitmap = ((BitmapDrawable)myDrawable).getBitmap();
-                    SharedValues.gridPosistions = "1,5";
-                    SharedValues.measureSoundResource = R.raw.twinkle_1;
-                    break;
+        //public WithDraggingShadow(View v){
+        public WithDraggingShadow(GameButton gb) {
+            super(gb);
 
-                case R.id.btn2:
-                case R.id.btn6:
-                    myDrawable = getResources().getDrawable(R.mipmap.ic_twinkle1);
-                    shdBitmap = ((BitmapDrawable)myDrawable).getBitmap();
-                    SharedValues.gridPosistions = "2,6";
-                    SharedValues.measureSoundResource = R.raw.twinkle_2;
-                    break;
-
-                case R.id.btn3:
-                case R.id.btn4:
-                    myDrawable = getResources().getDrawable(R.mipmap.ic_twinkle1);
-                    shdBitmap = ((BitmapDrawable)myDrawable).getBitmap();
-                    SharedValues.gridPosistions = "3,4";
-                    SharedValues.measureSoundResource = R.raw.twinkle_3;
-                    break;
-
-                default:
-                    Log.d("LevelOneActivity","StartDraggingListener unknown button");
-                    break;
-
-            }
+            shdBitmap = ((BitmapDrawable) gb.getBackground()).getBitmap();
         }
 
         @Override
@@ -336,5 +315,14 @@ public class LevelOneActivity extends AppCompatActivity {
         }
     }
 
+    class GbOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            GameButton gb = (GameButton) v;
+            MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, gb.getSoundResourceId());
+            mp.start();
+        }
+    }
 
 }
