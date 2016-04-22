@@ -57,60 +57,60 @@ public class LevelOneActivity extends AppCompatActivity {
         btn6 = (GameButton) findViewById(R.id.btn6);
 
         //this data determines what this level is
-        btn1.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0|4,0", false);
-        btn2.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0|5,0", false);
-        btn3.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "2,0|3,0", false);
-        btn4.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0|0,4", false);
-        btn5.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0|4,0", false);
-        btn6.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0|5,0", false);
+        btn1.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
+        btn2.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
+        btn3.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "2,0:3,0", false);
+        btn4.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:0,4", false);
+        btn5.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
+        btn6.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
 
         //shuffle buttons in layout
-        ArrayList<GameButton> gb = new ArrayList<>();
-        gb.add(btn1);
-        gb.add(btn2);
-        gb.add(btn3);
-        gb.add(btn4);
-        gb.add(btn5);
-        gb.add(btn6);
+        final ArrayList<GameButton> gbl = new ArrayList<>();
+        gbl.add(btn1);
+        gbl.add(btn2);
+        gbl.add(btn3);
+        gbl.add(btn4);
+        gbl.add(btn5);
+        gbl.add(btn6);
 
         long seed = System.nanoTime();
-        Collections.shuffle(gb, new Random(seed));
+        Collections.shuffle(gbl, new Random(seed));
 
         android.widget.RelativeLayout.LayoutParams params;
-        params = (RelativeLayout.LayoutParams) gb.get(0).getLayoutParams();
+        params = (RelativeLayout.LayoutParams) gbl.get(0).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.addRule(RelativeLayout.ALIGN_PARENT_START);
-        gb.get(0).setLayoutParams(params);
+        gbl.get(0).setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) gb.get(1).getLayoutParams();
+        params = (RelativeLayout.LayoutParams) gbl.get(1).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gb.get(0).getId());
-        gb.get(1).setLayoutParams(params);
+        params.addRule(RelativeLayout.END_OF, gbl.get(0).getId());
+        gbl.get(1).setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) gb.get(2).getLayoutParams();
+        params = (RelativeLayout.LayoutParams) gbl.get(2).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gb.get(1).getId());
-        gb.get(2).setLayoutParams(params);
+        params.addRule(RelativeLayout.END_OF, gbl.get(1).getId());
+        gbl.get(2).setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) gb.get(3).getLayoutParams();
+        params = (RelativeLayout.LayoutParams) gbl.get(3).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gb.get(2).getId());
-        gb.get(3).setLayoutParams(params);
+        params.addRule(RelativeLayout.END_OF, gbl.get(2).getId());
+        gbl.get(3).setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) gb.get(4).getLayoutParams();
+        params = (RelativeLayout.LayoutParams) gbl.get(4).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gb.get(3).getId());
-        gb.get(4).setLayoutParams(params);
+        params.addRule(RelativeLayout.END_OF, gbl.get(3).getId());
+        gbl.get(4).setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) gb.get(5).getLayoutParams();
+        params = (RelativeLayout.LayoutParams) gbl.get(5).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gb.get(4).getId());
-        gb.get(5).setLayoutParams(params);
+        params.addRule(RelativeLayout.END_OF, gbl.get(4).getId());
+        gbl.get(5).setLayoutParams(params);
 
 
 //        btn1.setLayoutParams(new LinearLayout.LayoutParams(panel.cellHeight,panel.cellWidth));
@@ -140,6 +140,10 @@ public class LevelOneActivity extends AppCompatActivity {
               @Override
               public void onClick(View v) {
                   SharedValues.levelGameStatus = SharedValues.GameStatus.RESET;
+                  for (GameButton gb : gbl) {
+                      gb.setEnabled(true);
+                      gb.setBackgroundResource(gb.getImageResourceId());
+                  }
               }
           }
         );
@@ -196,6 +200,7 @@ public class LevelOneActivity extends AppCompatActivity {
         findViewById(R.id.btnPlayGrid).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedValues.levelGameStatus = SharedValues.GameStatus.GRID_SONG_PLAYING;
                 Log.d("KSM", "Entering onClickVew");
                 for (int r = 0; r < GameGrid.ROWS; ++r) {
                     for (int c = 0; c < GameGrid.COLS; ++c) {

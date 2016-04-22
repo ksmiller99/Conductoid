@@ -14,6 +14,6 @@ public class SharedValues {
     public static int hlCol = -1;
     public static int hlRow = -1;
 
-    public enum GameStatus {INITIAL, STARTED, RESET, FAILED}
+    public enum GameStatus {INITIAL, STARTED, RESET, FAILED, GRID_SONG_PLAYING}
 
 }

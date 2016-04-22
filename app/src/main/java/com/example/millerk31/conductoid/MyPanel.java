@@ -11,7 +11,6 @@ import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 
 import java.util.ArrayList;
 
@@ -30,6 +29,7 @@ public class MyPanel extends View {
     Paint bluePaint = new Paint();
     Paint activePaint = new Paint();
     Paint bgPaint = new Paint();
+    Paint redPaint = new Paint();
     //list of exploding Sprites
     ArrayList<Sprite> expSprites;
     GameGrid gg;
@@ -100,6 +100,7 @@ public class MyPanel extends View {
 
         bgPaint.setARGB(255, 255, 255, 0);
         bluePaint.setARGB(255, 0, 0, 255);
+        redPaint.setARGB(255, 255, 0, 0);
         activePaint.setARGB(255, 192, 192, 192);
         canvas.drawARGB(255, 255, 255, 0);
 
@@ -133,6 +134,7 @@ public class MyPanel extends View {
                 }
 
                 //highlight cell if flagged
+                //todo cell highlight during playback not working OnClickListener blocks thread?
                 if ((c == SharedValues.hlCol) && (r == SharedValues.hlRow)) {
                     //Log.d("KSM", "setting highlight");
                     float[] corners = {leftX + 5, topY,
@@ -141,6 +143,32 @@ public class MyPanel extends View {
                             leftX + 5, btmY,
                             leftX + 5, topY};
                     canvas.drawLines(corners, bluePaint);
+                }
+
+                //check if sprite is in valid cell and highlight in red if not
+                if (GameGrid.myGrid[c][r] != null) {
+                    boolean wrongCell = true;
+                    String gp = (GameGrid.myGrid[c][r]).gridPositions;
+                    String cells[] = (gp.split(":"));
+                    for (String cell : cells) {
+                        String items[] = cell.split(",");
+                        if ((Integer.parseInt(items[0]) == c) && (Integer.parseInt(items[1]) == r)) {
+                            wrongCell = false;
+                            break;
+                        }
+                    }
+
+                    if (wrongCell) {
+                        float[] corners = {leftX + 5, topY,
+                                rightX - 5, topY,
+                                rightX - 5, btmY,
+                                leftX + 5, btmY,
+                                leftX + 5, topY};
+                        canvas.drawLines(corners, redPaint);
+
+                    }
+
+
                 }
             }
         }
@@ -183,14 +211,17 @@ public class MyPanel extends View {
                 int col = (int) x / cellWidth;
 
                 //extract image from shadow and convert to bitmap same size as cell
-                Button btn = (Button) event.getLocalState();
+                GameButton btn = (GameButton) event.getLocalState();
                 Drawable drw = btn.getBackground();
                 Bitmap bmp = ((BitmapDrawable) drw).getBitmap();
                 Bitmap bmp2 = Bitmap.createScaledBitmap(bmp, cellWidth - 5, cellHeight, false);
 
-                //check to see if cell is active
-                if (((row * GameGrid.COLS) + col) < SharedValues.songLength) {
-                    (GameGrid.myGrid[col][row]) = new Sprite(bmp2, SharedValues.gridPosistions, SharedValues.measureSoundResource);
+                //check to see if cell is active and empty
+                if ((((row * GameGrid.COLS) + col) < SharedValues.songLength) && (GameGrid.myGrid[col][row] == null)) {
+                    //(GameGrid.myGrid[col][row]) = new Sprite(bmp2, SharedValues.gridPosistions, SharedValues.measureSoundResource);
+                    (GameGrid.myGrid[col][row]) = new Sprite(bmp2, btn.getValidGridLocations(), btn.getSoundResourceId());
+                    btn.setBackground(null);
+                    btn.setEnabled(false);
                 } else {
                     //not an active cell - explode it!
                     expSprites.add(new Sprite(bmp2, x, y));

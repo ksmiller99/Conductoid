@@ -72,4 +72,12 @@ public class GameButton extends Button {
         this.validGridLocations = validGridLocations;
         this.isReusable = isReusable;
     }
+
+    public int getImageResourceId() {
+        return imageResourceId;
+    }
+
+    public void setImageResourceId(int imageResourceId) {
+        this.imageResourceId = imageResourceId;
+    }
 }
