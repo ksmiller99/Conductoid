@@ -1,6 +1,10 @@
 package com.example.millerk31.conductoid;
 
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -16,12 +20,12 @@ import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
@@ -41,6 +45,9 @@ public class LevelOneActivity extends AppCompatActivity {
 
     ImageButton btnReset, btnPlayOriginalSong, btnPlayGridSong;
     GameButton btn1, btn2, btn3, btn4, btn5, btn6;
+    ImageView ivSatisfaction;
+
+    Animation alphaAnim;
 
     MyPanel panel;
     GameGrid gg;
@@ -50,28 +57,51 @@ public class LevelOneActivity extends AppCompatActivity {
     ArrayList<PlayListRecord> playList;
     EditText etHidden;
 
+    IntentFilter myPanelMessageFilter = new IntentFilter();
+    BroadcastReceiver myReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("KSM", "Broadcast intent received");
+            if (intent.getAction().equals("myPanelMessage")) {
+                switch (intent.getStringExtra("status")) {
+                    case "success":
+                        ivSatisfaction.setImageResource(R.drawable.ic_sentiment_very_satisfied_black_24dp);
+                        break;
+
+                    case "failed":
+                        ivSatisfaction.setImageResource(R.drawable.ic_sentiment_very_dissatisfied_black_24dp);
+
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
-        animation.setDuration(500); // duration - half a second
-        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
-        animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
-        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
-
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_level_one);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.drawable.conductoid);
 
+        SharedValues.levelGameStatus = SharedValues.GameStatus.INITIAL;
         //set length of this song in measures
-        SharedValues.songLength=6;
+        SharedValues.songLength = 6;
 
         gson = new Gson();
 
+        alphaAnim = AnimationUtils.loadAnimation(LevelOneActivity.this, R.anim.alpha);
         gg = GameGrid.getInstance();
         panel = (MyPanel) findViewById(R.id.myPanel);
+
+        myPanelMessageFilter.addAction("myPanelMessage");
+        registerReceiver(myReceiver, myPanelMessageFilter);
 
         playList = new ArrayList<>();
         etHidden = (EditText) findViewById(R.id.etHiddenPlaylist);
@@ -103,9 +133,12 @@ public class LevelOneActivity extends AppCompatActivity {
                             etHidden.setText(gson.toJson(playList.get(0)));
                             playList.remove(0);
                         } else {
-                            SharedValues.levelGameStatus = SharedValues.GameStatus.STARTED;
                             SharedValues.hlCol = -1;
                             SharedValues.hlRow = -1;
+                            if (SharedValues.levelGameStatus != SharedValues.GameStatus.SUCCESS) {
+                                btnReset.startAnimation(alphaAnim);
+                                SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
+                            }
                         }
                     }
                 });
@@ -119,9 +152,10 @@ public class LevelOneActivity extends AppCompatActivity {
 
         btnReset = (ImageButton) findViewById(R.id.btnReset);
         btnPlayOriginalSong = (ImageButton) findViewById(R.id.btnPlaySong);
-        btnPlayOriginalSong.startAnimation(animation);
+        btnPlayOriginalSong.startAnimation(alphaAnim);
         btnPlayGridSong = (ImageButton) findViewById(R.id.btnPlayGrid);
 
+        ivSatisfaction = (ImageView) findViewById(R.id.iv_Satisfaction);
 
         btn1 = (GameButton) findViewById(R.id.btn1);
         btn2 = (GameButton) findViewById(R.id.btn2);
@@ -225,7 +259,7 @@ public class LevelOneActivity extends AppCompatActivity {
         btn5.setOnClickListener(myGbOnClickListener);
         btn6.setOnClickListener(myGbOnClickListener);
 
-        findViewById(R.id.btnPlaySong).setOnClickListener(new View.OnClickListener() {
+        btnPlayOriginalSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 v.clearAnimation();
@@ -236,20 +270,21 @@ public class LevelOneActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btnReset).setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  SharedValues.levelGameStatus = SharedValues.GameStatus.RESET;
-                  for (GameButton gb : gbl) {
-                      gb.setEnabled(true);
-                      gb.setBackgroundResource(gb.getImageResourceId());
-                  }
-              }
-          }
+        btnReset.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            v.clearAnimation();
+                                            SharedValues.levelGameStatus = SharedValues.GameStatus.RESET;
+                                            for (GameButton gb : gbl) {
+                                                gb.setEnabled(true);
+                                                gb.setBackgroundResource(gb.getImageResourceId());
+                                            }
+                                        }
+                                    }
         );
 
 
-        findViewById(R.id.btnPlayGrid).setOnClickListener(new View.OnClickListener() {
+        btnPlayGridSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("KSM", "Entering onClickVew");
@@ -300,31 +335,31 @@ public class LevelOneActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class EndDraggingListener implements View.OnDragListener{
+    private class EndDraggingListener implements View.OnDragListener {
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
-            if(event.getAction() == DragEvent.ACTION_DROP){
+            if (event.getAction() == DragEvent.ACTION_DROP) {
                 v.setBackground(((Button) event.getLocalState()).getBackground());
             }
             return true;
         }
     }
 
-    private class StartDraggingListener implements View.OnLongClickListener{
+    private class StartDraggingListener implements View.OnLongClickListener {
 
         @Override
         public boolean onLongClick(View v) {
 
             GameButton gb = (GameButton) v;
             WithDraggingShadow shadow = new WithDraggingShadow(gb);
-            ClipData data = ClipData.newPlainText("","");
-            v.startDrag(data,shadow,v,0);
+            ClipData data = ClipData.newPlainText("", "");
+            v.startDrag(data, shadow, v, 0);
             return false;
         }
     }
 
-    private class WithDraggingShadow extends View.DragShadowBuilder{
+    private class WithDraggingShadow extends View.DragShadowBuilder {
         Bitmap shdBitmap;
 
         //public WithDraggingShadow(View v){
@@ -342,7 +377,7 @@ public class LevelOneActivity extends AppCompatActivity {
         @Override
         public void onDrawShadow(Canvas canvas) {
             //super.onDrawShadow(canvas);
-            canvas.drawBitmap(shdBitmap,(canvas.getWidth()-shdBitmap.getWidth())/2,(canvas.getHeight()-shdBitmap.getHeight())/2,null);
+            canvas.drawBitmap(shdBitmap, (canvas.getWidth() - shdBitmap.getWidth()) / 2, (canvas.getHeight() - shdBitmap.getHeight()) / 2, null);
         }
     }
 
@@ -370,5 +405,6 @@ public class LevelOneActivity extends AppCompatActivity {
             this.soundResourceId = soundResourceId;
         }
     }
+
 
 }

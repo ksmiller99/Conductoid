@@ -1,6 +1,7 @@
 package com.example.millerk31.conductoid;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -35,11 +36,17 @@ public class MyPanel extends View {
     ArrayList<Sprite> expSprites;
     GameGrid gg;
 
+    //intents to send messages to actvities
+    Intent myPanelMessage;
+
     public MyPanel(Context context, AttributeSet set) {
         super(context, set);
 
         gg = GameGrid.getInstance();
         expSprites = new ArrayList<Sprite>();
+
+        myPanelMessage = new Intent();
+        myPanelMessage.setAction("myPanelMessage");
 
         setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -91,16 +98,15 @@ public class MyPanel extends View {
         float rightX;
         float btmY;
 
-        if (SharedValues.levelGameStatus == SharedValues.GameStatus.RESET) {
-
-        }
-
         bgPaint.setARGB(255, 255, 255, 0);
         bluePaint.setARGB(255, 0, 0, 255);
         redPaint.setARGB(255, 255, 0, 0);
         greenPaint.setARGB(255, 0, 255, 0);
         activePaint.setARGB(255, 192, 192, 192);
         canvas.drawARGB(255, 255, 255, 0);
+
+        //count number of sprites in wrong cell
+        int gridErrorCount = 0;
 
         //draw the cells and contents
         for (int r = 0; r < GameGrid.ROWS; ++r) {
@@ -156,6 +162,7 @@ public class MyPanel extends View {
                         }
 
                         if (wrongCell) {
+                            gridErrorCount++;
                             redPaint.setStrokeWidth(5);
                             canvas.drawLines(corners, redPaint);
                         } else {
@@ -184,8 +191,29 @@ public class MyPanel extends View {
 
         }
 
-        if (SharedValues.levelGameStatus == SharedValues.GameStatus.RESET)
-            SharedValues.levelGameStatus = SharedValues.GameStatus.INITIAL;
+        switch (SharedValues.levelGameStatus) {
+            case RESET:
+                SharedValues.levelGameStatus = SharedValues.GameStatus.INITIAL;
+                break;
+
+            case GRID_SONG_PLAYING:
+                if (gridErrorCount > 0) {
+                    SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
+                    myPanelMessage.putExtra("status", "failed");
+                } else {
+                    SharedValues.levelGameStatus = SharedValues.GameStatus.SUCCESS;
+                    myPanelMessage.putExtra("status", "success");
+                }
+                getContext().sendBroadcast(myPanelMessage);
+                myPanelMessage.removeExtra("status");
+                break;
+
+            default:
+                break;
+
+        }
+
+
         invalidate();
 
     }

@@ -12,9 +12,9 @@
     android:weightSum="1"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".LevelOneActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_level_one">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="24dp"
         android:orientation="horizontal">
@@ -29,14 +29,28 @@
             android:id="@+id/btnPlaySong"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/btnReset"
             android:src="@drawable/ic_volume_up_black_24dp" />
 
         <ImageButton
             android:id="@+id/btnPlayGrid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="36dp"
+            android:layout_toEndOf="@+id/btnReset"
             android:src="@drawable/ic_play_arrow_black_24dp" />
-    </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_Satisfaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
+            android:src="@drawable/ic_sentiment_neutral_black_24dp" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"

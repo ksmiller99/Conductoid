@@ -9,8 +9,8 @@
     tools:context=".LevelOneActivity">
 
     <android.support.design.widget.AppBarLayout
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"
         android:layout_marginStart="0dp"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -19,14 +19,14 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
             android:layout_marginLeft="0dp"
+            android:background="?attr/colorPrimary"
             app:contentInsetEnd="0dp"
             app:contentInsetStart="0dp"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/content_level_one" />
 
 </android.support.design.widget.CoordinatorLayout>
