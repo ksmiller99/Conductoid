@@ -9,13 +9,22 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,18 +32,34 @@ import java.util.Random;
 
 public class LevelOneActivity extends AppCompatActivity {
 
+    //used for storing objects in text fields
+    Gson gson;
+
     StartDraggingListener myStartDraggingListener;
     EndDraggingListener myEndDraggingListener;
     GbOnClickListener myGbOnClickListener;
 
+    ImageButton btnReset, btnPlayOriginalSong, btnPlayGridSong;
     GameButton btn1, btn2, btn3, btn4, btn5, btn6;
-    MyPanel panel;
 
+    MyPanel panel;
     GameGrid gg;
+
+    //media player and play list
+    MediaPlayer mp = new MediaPlayer();
+    ArrayList<PlayListRecord> playList;
+    EditText etHidden;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+        animation.setDuration(500); // duration - half a second
+        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+        animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
+        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -43,12 +68,60 @@ public class LevelOneActivity extends AppCompatActivity {
         //set length of this song in measures
         SharedValues.songLength=6;
 
+        gson = new Gson();
+
         gg = GameGrid.getInstance();
         panel = (MyPanel) findViewById(R.id.myPanel);
+
+        playList = new ArrayList<>();
+        etHidden = (EditText) findViewById(R.id.etHiddenPlaylist);
+        etHidden.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            //hack to get recursive calls MediaPlayer tp play playlist
+            @Override
+            public void afterTextChanged(Editable s) {
+                //no error checking - should only contain next sound resource ID
+                PlayListRecord plr = gson.fromJson(s.toString(), PlayListRecord.class);
+                mp = MediaPlayer.create(LevelOneActivity.this, plr.soundResourceId);
+                SharedValues.hlCol = plr.column;
+                SharedValues.hlRow = plr.row;
+                mp.start();
+                mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mp.release();
+                        if (!playList.isEmpty()) {
+                            etHidden.setText(gson.toJson(playList.get(0)));
+                            playList.remove(0);
+                        } else {
+                            SharedValues.levelGameStatus = SharedValues.GameStatus.STARTED;
+                            SharedValues.hlCol = -1;
+                            SharedValues.hlRow = -1;
+                        }
+                    }
+                });
+
+            }
+        });
 
         myStartDraggingListener = new StartDraggingListener();
         myEndDraggingListener = new EndDraggingListener();
         myGbOnClickListener = new GbOnClickListener();
+
+        btnReset = (ImageButton) findViewById(R.id.btnReset);
+        btnPlayOriginalSong = (ImageButton) findViewById(R.id.btnPlaySong);
+        btnPlayOriginalSong.startAnimation(animation);
+        btnPlayGridSong = (ImageButton) findViewById(R.id.btnPlayGrid);
+
 
         btn1 = (GameButton) findViewById(R.id.btn1);
         btn2 = (GameButton) findViewById(R.id.btn2);
@@ -58,14 +131,31 @@ public class LevelOneActivity extends AppCompatActivity {
         btn6 = (GameButton) findViewById(R.id.btn6);
 
         //this data determines what this level is
+        //attach resources and config info to GameButton
+        //GameButton.setAll(soundResourceId, imageResourceId, validGridLocations, isButtonReusable)
         btn1.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
         btn2.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
-        btn3.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle1, "2,0:3,0", false);
-        btn4.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle1, "0,0:0,4", false);
+        btn3.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle3, "2,0:3,0", false);
+        btn4.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle3, "2,0:3,0", false);
         btn5.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
         btn6.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
 
+        //btn1.setLayoutParams(new RelativeLayout.LayoutParams(panel.cellHeight,panel.cellWidth));
+        btn1.setHeight(panel.cellHeight);
+        btn1.setWidth(panel.cellWidth);
+        btn2.setHeight(panel.cellHeight);
+        btn2.setWidth(panel.cellWidth);
+        btn3.setHeight(panel.cellHeight);
+        btn3.setWidth(panel.cellWidth);
+        btn4.setHeight(panel.cellHeight);
+        btn4.setWidth(panel.cellWidth);
+        btn5.setHeight(panel.cellHeight);
+        btn5.setWidth(panel.cellWidth);
+        btn6.setHeight(panel.cellHeight);
+        btn6.setWidth(panel.cellWidth);
+
         //shuffle buttons in layout
+        //addd buttons to list to br shuffled
         final ArrayList<GameButton> gbl = new ArrayList<>();
         gbl.add(btn1);
         gbl.add(btn2);
@@ -74,53 +164,52 @@ public class LevelOneActivity extends AppCompatActivity {
         gbl.add(btn5);
         gbl.add(btn6);
 
+        //shuffle list
         long seed = System.nanoTime();
         Collections.shuffle(gbl, new Random(seed));
 
+        // put buttons in new place in layout
         android.widget.RelativeLayout.LayoutParams params;
         params = (RelativeLayout.LayoutParams) gbl.get(0).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.addRule(RelativeLayout.ALIGN_PARENT_START);
+        params.setMarginStart(0);
         gbl.get(0).setLayoutParams(params);
 
         params = (RelativeLayout.LayoutParams) gbl.get(1).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
         params.addRule(RelativeLayout.END_OF, gbl.get(0).getId());
+        params.setMarginStart(15);
         gbl.get(1).setLayoutParams(params);
 
         params = (RelativeLayout.LayoutParams) gbl.get(2).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
         params.addRule(RelativeLayout.END_OF, gbl.get(1).getId());
+        params.setMarginStart(15);
         gbl.get(2).setLayoutParams(params);
 
         params = (RelativeLayout.LayoutParams) gbl.get(3).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
         params.addRule(RelativeLayout.END_OF, gbl.get(2).getId());
+        params.setMarginStart(15);
         gbl.get(3).setLayoutParams(params);
 
         params = (RelativeLayout.LayoutParams) gbl.get(4).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
         params.addRule(RelativeLayout.END_OF, gbl.get(3).getId());
+        params.setMarginStart(15);
         gbl.get(4).setLayoutParams(params);
 
         params = (RelativeLayout.LayoutParams) gbl.get(5).getLayoutParams();
         params.removeRule(RelativeLayout.END_OF);
         params.removeRule(RelativeLayout.ALIGN_PARENT_START);
         params.addRule(RelativeLayout.END_OF, gbl.get(4).getId());
+        params.setMarginStart(15);
         gbl.get(5).setLayoutParams(params);
-
-
-//        btn1.setLayoutParams(new LinearLayout.LayoutParams(panel.cellHeight,panel.cellWidth));
-//        //btn1.setHeight(panel.cellHeight); btn1.setWidth(panel.cellWidth);
-//        btn2.setHeight(panel.cellHeight); btn2.setWidth(panel.cellWidth);
-//        btn3.setHeight(panel.cellHeight); btn3.setWidth(panel.cellWidth);
-//        btn4.setHeight(panel.cellHeight); btn4.setWidth(panel.cellWidth);
-//        btn5.setHeight(panel.cellHeight); btn5.setWidth(panel.cellWidth);
-//        btn6.setHeight(panel.cellHeight); btn6.setWidth(panel.cellWidth);
 
         btn1.setOnLongClickListener(myStartDraggingListener);
         btn2.setOnLongClickListener(myStartDraggingListener);
@@ -139,7 +228,10 @@ public class LevelOneActivity extends AppCompatActivity {
         findViewById(R.id.btnPlaySong).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_twinkle_little_star_one_cycle);
+                v.clearAnimation();
+                if (mp.isPlaying())
+                    mp.stop();
+                mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_twinkle_little_star_one_cycle);
                 mp.start();
             }
         });
@@ -157,87 +249,26 @@ public class LevelOneActivity extends AppCompatActivity {
         );
 
 
-//        btn1.setOnClickListener(new GameButton.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                GameButton gb = (GameButton) v;
-//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, gb.getSoundResourceId());
-//                mp.start();
-//            }
-//        });
-//
-//        findViewById(R.id.btn2).setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
-//                mp.start();
-//            }
-//        });
-//
-//        findViewById(R.id.btn3).setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
-//                mp.start();
-//            }
-//        });
-//
-//        findViewById(R.id.btn4).setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_3);
-//                mp.start();
-//            }
-//        });
-//
-//        findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_1);
-//                mp.start();
-//            }
-//        });
-//
-//        findViewById(R.id.btn6).setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_2);
-//                mp.start();
-//            }
-//        });
-
         findViewById(R.id.btnPlayGrid).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedValues.levelGameStatus = SharedValues.GameStatus.GRID_SONG_PLAYING;
                 Log.d("KSM", "Entering onClickVew");
                 for (int r = 0; r < GameGrid.ROWS; ++r) {
                     for (int c = 0; c < GameGrid.COLS; ++c) {
                         Sprite sp = (GameGrid.myGrid[c][r]);
                         if ((sp != null) && (sp.measureSoundResource != 0)) {
-                            Log.d("KSM", "setting highlight");
-                            SharedValues.hlCol = c; //cell highlighting during playback
-                            SharedValues.hlRow = r; //cell highlighting during playback
-                            findViewById(R.id.myPanel).invalidate();
-                            Log.d("KSM", "invalidated");
-                            MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, sp.measureSoundResource);
-                            try {
-                                int dur = mp.getDuration();
-                                mp.start();
-                                Thread.sleep(dur);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            playList.add(new PlayListRecord(c, r, sp.measureSoundResource));
                         }
                     }
                 }
-                //disable cell highlighting
-                SharedValues.hlCol = -1;
-                SharedValues.hlRow = -1;
-                findViewById(R.id.myPanel).invalidate();
 
+                //start playList
+                etHidden.setText(gson.toJson(playList.get(0)));
+                playList.remove(0);
+                SharedValues.levelGameStatus = SharedValues.GameStatus.GRID_SONG_PLAYING;
             }
         });
+
 
     }
 
@@ -320,8 +351,23 @@ public class LevelOneActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             GameButton gb = (GameButton) v;
-            MediaPlayer mp = MediaPlayer.create(LevelOneActivity.this, gb.getSoundResourceId());
+            if (mp.isPlaying())
+                mp.stop();
+
+            mp = MediaPlayer.create(LevelOneActivity.this, gb.getSoundResourceId());
             mp.start();
+        }
+    }
+
+    class PlayListRecord {
+        int soundResourceId;
+        int column;
+        int row;
+
+        public PlayListRecord(int column, int row, int soundResourceId) {
+            this.column = column;
+            this.row = row;
+            this.soundResourceId = soundResourceId;
         }
     }
 
