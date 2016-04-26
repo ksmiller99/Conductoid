@@ -9,17 +9,15 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.millerk31.conductoid.Level2Activity"
-    tools:showIn="@layout/activity_level2">
-
+    tools:context="com.example.millerk31.conductoid.LevelThreeActivity"
+    tools:showIn="@layout/activity_level_three">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="257dp"
+        android:layout_centerVertical="true"
         android:text="Under Construction"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 </RelativeLayout>

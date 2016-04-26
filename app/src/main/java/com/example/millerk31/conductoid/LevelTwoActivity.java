@@ -37,8 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class LevelOneActivity extends AppCompatActivity {
-
+public class LevelTwoActivity extends AppCompatActivity {
     //used for storing objects in text fields
     Gson gson;
 
@@ -47,7 +46,7 @@ public class LevelOneActivity extends AppCompatActivity {
     GbOnClickListener myGbOnClickListener;
 
     ImageButton btnExit, btnReset, btnPlayOriginalSong, btnPlayGridSong, btnNextLevel;
-    GameButton btn1, btn2, btn3, btn4, btn5, btn6;
+    GameButton btn1, btn2, btn3;
     ImageView ivSatisfaction;
 
     Animation alphaAnim, rotateAnim;
@@ -127,7 +126,7 @@ public class LevelOneActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_level_one);
+        setContentView(R.layout.activity_level_two);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.drawable.conductoid);
@@ -139,8 +138,8 @@ public class LevelOneActivity extends AppCompatActivity {
 
         gson = new Gson();
 
-        alphaAnim = AnimationUtils.loadAnimation(LevelOneActivity.this, R.anim.alpha);
-        rotateAnim = AnimationUtils.loadAnimation(LevelOneActivity.this, R.anim.rotate);
+        alphaAnim = AnimationUtils.loadAnimation(LevelTwoActivity.this, R.anim.alpha);
+        rotateAnim = AnimationUtils.loadAnimation(LevelTwoActivity.this, R.anim.rotate);
 
         gg = GameGrid.getInstance();
         panel = (MyPanel) findViewById(R.id.myPanel);
@@ -166,7 +165,7 @@ public class LevelOneActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 //no error checking - should only contain next sound resource ID
                 PlayListRecord plr = gson.fromJson(s.toString(), PlayListRecord.class);
-                mp = MediaPlayer.create(LevelOneActivity.this, plr.soundResourceId);
+                mp = MediaPlayer.create(LevelTwoActivity.this, plr.soundResourceId);
                 SharedValues.hlCol = plr.column;
                 SharedValues.hlRow = plr.row;
                 mp.start();
@@ -205,19 +204,13 @@ public class LevelOneActivity extends AppCompatActivity {
         btn1 = (GameButton) findViewById(R.id.btn1);
         btn2 = (GameButton) findViewById(R.id.btn2);
         btn3 = (GameButton) findViewById(R.id.btn3);
-        btn4 = (GameButton) findViewById(R.id.btn4);
-        btn5 = (GameButton) findViewById(R.id.btn5);
-        btn6 = (GameButton) findViewById(R.id.btn6);
 
         //this data determines what this level is
         //attach resources and config info to GameButton
         //GameButton.setAll(soundResourceId, imageResourceId, validGridLocations, isButtonReusable)
-        btn1.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
-        btn2.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
-        btn3.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle3, "2,0:3,0", false);
-        btn4.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle3, "2,0:3,0", false);
-        btn5.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", false);
-        btn6.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", false);
+        btn1.setAll(R.raw.twinkle_1, R.mipmap.ic_twinkle1, "0,0:4,0", true);
+        btn2.setAll(R.raw.twinkle_2, R.mipmap.ic_twinkle2, "1,0:5,0", true);
+        btn3.setAll(R.raw.twinkle_3, R.mipmap.ic_twinkle3, "2,0:3,0", true);
 
         //btn1.setLayoutParams(new RelativeLayout.LayoutParams(panel.cellHeight,panel.cellWidth));
         btn1.setHeight(panel.cellHeight);
@@ -226,12 +219,6 @@ public class LevelOneActivity extends AppCompatActivity {
         btn2.setWidth(panel.cellWidth);
         btn3.setHeight(panel.cellHeight);
         btn3.setWidth(panel.cellWidth);
-        btn4.setHeight(panel.cellHeight);
-        btn4.setWidth(panel.cellWidth);
-        btn5.setHeight(panel.cellHeight);
-        btn5.setWidth(panel.cellWidth);
-        btn6.setHeight(panel.cellHeight);
-        btn6.setWidth(panel.cellWidth);
 
         //shuffle buttons in layout
         //addd buttons to list to br shuffled
@@ -239,9 +226,6 @@ public class LevelOneActivity extends AppCompatActivity {
         gbl.add(btn1);
         gbl.add(btn2);
         gbl.add(btn3);
-        gbl.add(btn4);
-        gbl.add(btn5);
-        gbl.add(btn6);
 
         //shuffle list
         long seed = System.nanoTime();
@@ -269,40 +253,13 @@ public class LevelOneActivity extends AppCompatActivity {
         params.setMarginStart(15);
         gbl.get(2).setLayoutParams(params);
 
-        params = (RelativeLayout.LayoutParams) gbl.get(3).getLayoutParams();
-        params.removeRule(RelativeLayout.END_OF);
-        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gbl.get(2).getId());
-        params.setMarginStart(15);
-        gbl.get(3).setLayoutParams(params);
-
-        params = (RelativeLayout.LayoutParams) gbl.get(4).getLayoutParams();
-        params.removeRule(RelativeLayout.END_OF);
-        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gbl.get(3).getId());
-        params.setMarginStart(15);
-        gbl.get(4).setLayoutParams(params);
-
-        params = (RelativeLayout.LayoutParams) gbl.get(5).getLayoutParams();
-        params.removeRule(RelativeLayout.END_OF);
-        params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-        params.addRule(RelativeLayout.END_OF, gbl.get(4).getId());
-        params.setMarginStart(15);
-        gbl.get(5).setLayoutParams(params);
-
         btn1.setOnLongClickListener(myStartDraggingListener);
         btn2.setOnLongClickListener(myStartDraggingListener);
         btn3.setOnLongClickListener(myStartDraggingListener);
-        btn4.setOnLongClickListener(myStartDraggingListener);
-        btn5.setOnLongClickListener(myStartDraggingListener);
-        btn6.setOnLongClickListener(myStartDraggingListener);
 
         btn1.setOnClickListener(myGbOnClickListener);
         btn2.setOnClickListener(myGbOnClickListener);
         btn3.setOnClickListener(myGbOnClickListener);
-        btn4.setOnClickListener(myGbOnClickListener);
-        btn5.setOnClickListener(myGbOnClickListener);
-        btn6.setOnClickListener(myGbOnClickListener);
 
         btnPlayOriginalSong.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -310,7 +267,7 @@ public class LevelOneActivity extends AppCompatActivity {
                 v.clearAnimation();
                 if (mp.isPlaying())
                     mp.stop();
-                mp = MediaPlayer.create(LevelOneActivity.this, R.raw.twinkle_twinkle_little_star_one_cycle);
+                mp = MediaPlayer.create(LevelTwoActivity.this, R.raw.twinkle_twinkle_little_star_one_cycle);
                 mp.start();
             }
         });
@@ -377,13 +334,10 @@ public class LevelOneActivity extends AppCompatActivity {
                 SharedValues.levelGameStatus = SharedValues.GameStatus.RESET;
                 SharedValues.cellsInUse = 0;
                 ivSatisfaction.setImageResource(R.drawable.ic_sentiment_neutral_black_24dp);
-                Intent i = new Intent(LevelOneActivity.this, LevelTwoActivity.class);
+                Intent i = new Intent(LevelTwoActivity.this, LevelThreeActivity.class);
                 startActivity(i);
             }
         });
-
-
-
     }
 
     @Override
@@ -487,7 +441,7 @@ public class LevelOneActivity extends AppCompatActivity {
             if (mp.isPlaying())
                 mp.stop();
 
-            mp = MediaPlayer.create(LevelOneActivity.this, gb.getSoundResourceId());
+            mp = MediaPlayer.create(LevelTwoActivity.this, gb.getSoundResourceId());
             mp.start();
         }
     }
@@ -506,4 +460,7 @@ public class LevelOneActivity extends AppCompatActivity {
     }
 
 
+
 }
+
+

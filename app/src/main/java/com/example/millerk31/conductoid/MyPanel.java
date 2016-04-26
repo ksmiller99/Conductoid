@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,6 +36,7 @@ public class MyPanel extends View {
     //list of exploding Sprites
     ArrayList<Sprite> expSprites;
     GameGrid gg;
+    int gridErrorCount;
 
     //intents to send messages to actvities
     Intent myPanelMessage;
@@ -44,6 +46,10 @@ public class MyPanel extends View {
 
         gg = GameGrid.getInstance();
         expSprites = new ArrayList<Sprite>();
+
+        //count number of sprites in wrong cell
+        gridErrorCount = 0;
+
 
         myPanelMessage = new Intent();
         myPanelMessage.setAction("myPanelMessage");
@@ -105,9 +111,6 @@ public class MyPanel extends View {
         activePaint.setARGB(255, 192, 192, 192);
         canvas.drawARGB(255, 255, 255, 0);
 
-        //count number of sprites in wrong cell
-        int gridErrorCount = 0;
-
         //draw the cells and contents
         for (int r = 0; r < GameGrid.ROWS; ++r) {
             for (int c = 0; c < GameGrid.COLS; ++c) {
@@ -162,7 +165,6 @@ public class MyPanel extends View {
                         }
 
                         if (wrongCell) {
-                            gridErrorCount++;
                             redPaint.setStrokeWidth(5);
                             canvas.drawLines(corners, redPaint);
                         } else {
@@ -194,15 +196,45 @@ public class MyPanel extends View {
         switch (SharedValues.levelGameStatus) {
             case RESET:
                 SharedValues.levelGameStatus = SharedValues.GameStatus.INITIAL;
+                gridErrorCount = 0;
                 break;
 
-            case GRID_SONG_PLAYING:
-                if (gridErrorCount > 0) {
-                    SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
-                    myPanelMessage.putExtra("status", "failed");
-                } else {
+            case GRID_SONG_FINISHED:
+                if (gridErrorCount == 0) {
                     SharedValues.levelGameStatus = SharedValues.GameStatus.SUCCESS;
                     myPanelMessage.putExtra("status", "success");
+                } else {
+                    int score = SharedValues.songLength - gridErrorCount;
+                    score = Math.round(((score / SharedValues.songLength) * 3));
+                    switch (score) {
+
+                        case 0:
+                            SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
+                            myPanelMessage.putExtra("status", "score:0");
+                            break;
+
+                        case 1:
+                            SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
+                            myPanelMessage.putExtra("status", "score:1");
+                            break;
+
+                        case 2:
+                            SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
+                            myPanelMessage.putExtra("status", "score:2");
+                            break;
+
+                        case 3:
+                            SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
+                            myPanelMessage.putExtra("status", "score:3");
+                            break;
+
+                        default:
+                            SharedValues.levelGameStatus = SharedValues.GameStatus.FAILED;
+                            myPanelMessage.putExtra("status", "score:Error");
+                            Log.d("MyPanel", "onDraw unexpected score value: " + String.valueOf(score));
+                            break;
+
+                    }
                 }
                 getContext().sendBroadcast(myPanelMessage);
                 myPanelMessage.removeExtra("status");
@@ -212,8 +244,6 @@ public class MyPanel extends View {
                 break;
 
         }
-
-
         invalidate();
 
     }
@@ -225,7 +255,7 @@ public class MyPanel extends View {
         public boolean onDrag(View v, DragEvent event) {
             if (event.getAction() == DragEvent.ACTION_DROP) {
 
-                //convert canvas X/Y to grid colum/row
+                //convert canvas X/Y to grid column/row
                 float x = event.getX();
                 float y = event.getY();
                 int row = (int) y / cellHeight;
@@ -239,10 +269,42 @@ public class MyPanel extends View {
 
                 //check to see if cell is active and empty
                 if ((((row * GameGrid.COLS) + col) < SharedValues.songLength) && (GameGrid.myGrid[col][row] == null)) {
-                    //(GameGrid.myGrid[col][row]) = new Sprite(bmp2, SharedValues.gridPosistions, SharedValues.measureSoundResource);
                     (GameGrid.myGrid[col][row]) = new Sprite(bmp2, btn.getValidGridLocations(), btn.getSoundResourceId());
-                    btn.setBackground(null);
-                    btn.setEnabled(false);
+                    if (!btn.isReusable()) {
+                        btn.setBackground(null);
+                        btn.setEnabled(false);
+                    }
+
+                    myPanelMessage.putExtra("status", "cellDropped");
+                    getContext().sendBroadcast(myPanelMessage);
+                    myPanelMessage.removeExtra("status");
+
+                    //update error
+                    //check if sprite is in valid cell and increment error count if not
+
+                    boolean wrongCell = true;
+                    String gp = (GameGrid.myGrid[col][row]).gridPositions;
+                    String cells[] = (gp.split(":"));
+                    for (String cell : cells) {
+                        String items[] = cell.split(",");
+                        if ((Integer.parseInt(items[0]) == col) && (Integer.parseInt(items[1]) == row)) {
+                            wrongCell = false;
+                            break;
+                        }
+                    }
+
+                    if (wrongCell) {
+                        gridErrorCount++;
+                        Log.d("gridErrorCount, C,R", String.valueOf(gridErrorCount) + ", " + String.valueOf(col) + ", " + String.valueOf(row));
+                    }
+
+                    ++SharedValues.cellsInUse;
+                    if (SharedValues.cellsInUse == SharedValues.songLength) {
+                        //enable playback
+                        myPanelMessage.putExtra("status", "gridFull");
+                        getContext().sendBroadcast(myPanelMessage);
+                        myPanelMessage.removeExtra("status");
+                    }
                 } else {
                     //not an active cell - explode it!
                     expSprites.add(new Sprite(bmp2, x, y));

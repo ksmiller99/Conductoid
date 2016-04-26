@@ -11,8 +11,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:weightSum="1"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".LevelOneActivity"
-    tools:showIn="@layout/activity_level_one">
+    tools:context=".LevelTwoActivity"
+    tools:showIn="@layout/activity_level_two">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -83,12 +83,12 @@
             android:background="@mipmap/ic_twinkle1" />
 
         <com.example.millerk31.conductoid.GameButton
-             android:id="@+id/btn2"
+            android:id="@+id/btn2"
             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/btn1"
-             android:background="@mipmap/ic_twinkle2" />
+            android:background="@mipmap/ic_twinkle2" />
 
         <com.example.millerk31.conductoid.GameButton
             android:id="@+id/btn3"
@@ -98,36 +98,14 @@
             android:layout_toEndOf="@+id/btn2"
             android:background="@mipmap/ic_twinkle3" />
 
-        <com.example.millerk31.conductoid.GameButton
-            android:id="@+id/btn4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/btn3"
-            android:background="@mipmap/ic_twinkle3" />
-
-        <com.example.millerk31.conductoid.GameButton
-            android:id="@+id/btn5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/btn4"
-            android:background="@mipmap/ic_twinkle1" />
-
-        <com.example.millerk31.conductoid.GameButton
-            android:id="@+id/btn6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/btn5"
-            android:background="@mipmap/ic_twinkle2" />
-
     </RelativeLayout>
+
     <com.example.millerk31.conductoid.MyPanel
         android:id="@+id/myPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

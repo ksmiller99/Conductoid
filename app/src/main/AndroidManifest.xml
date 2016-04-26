@@ -22,8 +22,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Level2Activity"
-            android:label="@string/title_activity_level2"
+            android:name=".LevelTwoActivity"
+            android:label="@string/title_activity_level_two"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".LevelThreeActivity"
+            android:label="@string/title_activity_level_three"
+            android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
